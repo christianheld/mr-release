@@ -89,7 +89,7 @@ Task("TestReport")
         "./artifacts/TestReport");
 });
 
-Task("Publish")
+Task("DotNetPublish")
     .DoesForEach(new[] { "win-x64", "linux-x64" }, runtime =>
 {
     DotNetPublish(
@@ -101,7 +101,8 @@ Task("Publish")
             PublishSingleFile = true,
             Runtime = runtime,
             SelfContained = true,
-            PublishTrimmed = true
+            PublishTrimmed = true,
+            IncludeNativeLibrariesForSelfExtract = true,
         });
 
     CreateDirectory($"./artifacts/{runtime}");
@@ -115,5 +116,8 @@ Task("Default")
    .IsDependentOn("CleanArtifacts")
    .IsDependentOn("Test");
 
+Task("Publish")
+    .IsDependentOn("CleanArtifacts")
+    .IsDependentOn("DotNetPublish");
 
 RunTarget(target);
