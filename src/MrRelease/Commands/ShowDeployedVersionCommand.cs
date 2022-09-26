@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi;
 
 using MrDeploy.Services;
@@ -16,10 +17,14 @@ namespace MrDeploy.Commands;
 public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionCommand.Settings>
 {
     private readonly ReleaseService _releaseService;
+    private readonly AzureDevOpsOptions _azureDevOpsOptions;
 
-    public ShowDeployedVersionCommand(ReleaseService releaseService)
+    public ShowDeployedVersionCommand(ReleaseService releaseService, IOptions<AzureDevOpsOptions> azureDevOpsOptions)
     {
+        if (azureDevOpsOptions is null) throw new ArgumentNullException(nameof(azureDevOpsOptions));
+
         _releaseService = releaseService;
+        _azureDevOpsOptions = azureDevOpsOptions.Value;
     }
 
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] Settings settings)
@@ -27,10 +32,12 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         AnsiConsole.MarkupLine($"Directory:   [blue]{settings.Folder}[/]");
         AnsiConsole.MarkupLine($"Environment: [green]{settings.Environment}[/]");
 
+        var project = settings.Project ?? _azureDevOpsOptions.Project;
+
         var deployedReleases = await AnsiConsole.Status()
             .StartAsync(
                 "Fetching Release Information",
-                async _ => await _releaseService.GetDeployedReleases(settings.Folder, settings.Environment));
+                async _ => await _releaseService.GetDeployedReleases(project, settings.Folder, settings.Environment));
 
         if (deployedReleases.Count == 0)
         {
@@ -124,7 +131,7 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         return localTime.ToString(CultureInfo.CurrentCulture);
     }
 
-    public class Settings : CommandSettings
+    public class Settings : BaseSettings
     {
         [Description("The Release Folder")]
         [CommandArgument(0, "<FOLDER>")]
