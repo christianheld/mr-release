@@ -1,0 +1,4 @@
+{
+    // "Modern .NET" OmniSharp does not support cake, yet.
+    "omnisharp.useModernNet": false
+}
