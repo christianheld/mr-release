@@ -13,15 +13,13 @@ namespace MrDeploy.Services;
 public class ReleaseService
 {
     private readonly AzureDevOpsOptions _azureDevOpsSettings;
-    private readonly string _project;
 
     public ReleaseService(IOptions<AzureDevOpsOptions> azureDevOpsSettings)
     {
         _azureDevOpsSettings = azureDevOpsSettings?.Value ?? throw new ArgumentNullException(nameof(azureDevOpsSettings));
-        _project = _azureDevOpsSettings.Project;
     }
 
-    public async Task<IReadOnlyList<Release>> GetActiveReleasesAsync(string folder)
+    public async Task<IReadOnlyList<Release>> GetActiveReleasesAsync(string project, string folder)
     {
         if (string.IsNullOrWhiteSpace(folder))
             throw new ArgumentException($"'{nameof(folder)}' cannot be null or whitespace.", nameof(folder));
@@ -29,7 +27,7 @@ public class ReleaseService
         using var connection = _azureDevOpsSettings.CreateConnection();
         var client = await connection.GetClientAsync<ReleaseHttpClient2>();
 
-        var path = await GetFolderPathAsync(client, folder);
+        var path = await GetFolderPathAsync(client, project, folder);
 
         var releases = new List<Release>();
 
@@ -37,7 +35,7 @@ public class ReleaseService
         do
         {
             var page = await client.GetReleasesAsync2(
-                project: _project,
+                project: project,
                 path: path,
                 statusFilter: ReleaseStatus.Active,
                 top: 100,
@@ -54,9 +52,9 @@ public class ReleaseService
         return releases;
     }
 
-    public async Task<IReadOnlyList<DeployedRelease>> GetDeployedReleases(string folder, string environment)
+    public async Task<IReadOnlyList<DeployedRelease>> GetDeployedReleases(string project, string folder, string environment)
     {
-        var activeReleases = await GetActiveReleasesAsync(folder);
+        var activeReleases = await GetActiveReleasesAsync(project, folder);
 
         return activeReleases
             .Where(release => release.Environments
@@ -107,11 +105,11 @@ public class ReleaseService
         };
     }
 
-    private async Task<string> GetFolderPathAsync(ReleaseHttpClient2 client, string folder)
+    private static async Task<string> GetFolderPathAsync(ReleaseHttpClient2 client, string project, string folder)
     {
         var searchFolder = $"\\{folder.Replace('/', '\\')}";
 
-        var folders = await client.GetFoldersAsync(_project, searchFolder);
+        var folders = await client.GetFoldersAsync(project, searchFolder);
         if (folders.Count == 0)
         {
             throw new InvalidOperationException(
