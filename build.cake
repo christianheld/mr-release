@@ -113,8 +113,7 @@ Task("Publish")
 
 Task("Default")
    .IsDependentOn("CleanArtifacts")
-   .IsDependentOn("Test")
-   .IsDependentOn("Publish");
+   .IsDependentOn("Test");
 
 
 RunTarget(target);
