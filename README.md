@@ -13,6 +13,12 @@ Currently `MrRelase` supports following commands:
 ### Initialize configuration
  `init` - Inititalize Mr.Release and write settings to `~/.mrrelease/settings.json`
 
+Make sure you have created a Personal Access Token with rights to read releases!
+
+```example
+MrRelease init
+```
+
 ### Show current releases
 `show` - Show the currently active releases inside a folder for a certain stage.
 
