@@ -25,5 +25,5 @@ jobs:
       run: dotnet tool restore
     
     - name: Build
-      run: dotnet cake
+      run: dotnet cake --target=Build
  

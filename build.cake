@@ -112,12 +112,16 @@ Task("DotNetPublish")
 });
 
 
-Task("Default")
+Task("Build")
    .IsDependentOn("CleanArtifacts")
    .IsDependentOn("Test");
 
 Task("Publish")
     .IsDependentOn("CleanArtifacts")
     .IsDependentOn("DotNetPublish");
+
+Task("Default")
+    .IsDependentOn("Build")
+    .IsDependentOn("Publish");
 
 RunTarget(target);
