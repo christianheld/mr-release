@@ -1,8 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-
 using Spectre.Console.Cli;
 
-namespace MrDeploy.Infrastructure;
+namespace MrRelease.Infrastructure;
 
 public class TypeRegistrar : ITypeRegistrar
 {
