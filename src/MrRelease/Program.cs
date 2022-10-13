@@ -1,18 +1,14 @@
 using System.Diagnostics;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-
-using MrDeploy;
-using MrDeploy.Commands;
-using MrDeploy.Infrastructure;
-using MrDeploy.Services;
-
 using MrRelease.Commands;
-
+using MrRelease.Infrastructure;
+using MrRelease.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
+
+namespace MrRelease;
 
 internal class Program
 {

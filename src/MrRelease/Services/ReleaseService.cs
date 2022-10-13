@@ -1,14 +1,12 @@
 using System.Globalization;
-
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Clients;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 using Microsoft.VisualStudio.Services.WebApi;
-
 using MrRelease.Models;
 
-namespace MrDeploy.Services;
+namespace MrRelease.Services;
 
 public class ReleaseService
 {
@@ -19,7 +17,7 @@ public class ReleaseService
         _azureDevOpsSettings = azureDevOpsSettings?.Value ?? throw new ArgumentNullException(nameof(azureDevOpsSettings));
     }
 
-    public async Task<IReadOnlyList<Release>> GetActiveReleasesAsync(string project, string folder)
+    private async Task<IReadOnlyList<Release>> GetActiveReleasesAsync(string project, string folder)
     {
         if (string.IsNullOrWhiteSpace(folder))
             throw new ArgumentException($"'{nameof(folder)}' cannot be null or whitespace.", nameof(folder));

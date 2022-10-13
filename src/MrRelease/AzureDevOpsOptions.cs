@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 
-namespace MrDeploy;
+namespace MrRelease;
 
 public class AzureDevOpsOptions
 {

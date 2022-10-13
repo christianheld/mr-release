@@ -1,18 +1,14 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi;
-
-using MrDeploy.Services;
-
 using MrRelease.Models;
-
+using MrRelease.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace MrDeploy.Commands;
+namespace MrRelease.Commands;
 
 public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionCommand.Settings>
 {
