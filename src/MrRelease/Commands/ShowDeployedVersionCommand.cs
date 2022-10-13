@@ -121,6 +121,9 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         return new Markup(string.Join(", ", environments));
     }
 
+    private static string FormatDateTime(DateTime? dateTime) =>
+        dateTime.HasValue ? FormatDateTime(dateTime.Value) : "";
+
     private static string FormatDateTime(DateTime dateTime)
     {
         var localTime = dateTime.ToLocalTime();
