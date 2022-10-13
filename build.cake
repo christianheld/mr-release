@@ -90,7 +90,7 @@ Task("TestReport")
 });
 
 Task("DotNetPublish")
-    .DoesForEach(new[] { "win-x64", "linux-x64" }, runtime =>
+    .DoesForEach(new[] { "win-x64", "linux-x64", "osx-x64" }, runtime =>
 {
     DotNetPublish(
         "./src/MrRelease/MrRelease.csproj",
