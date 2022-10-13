@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
-
 using Spectre.Console.Cli;
 
-namespace MrDeploy.Commands;
+namespace MrRelease.Commands;
 
 public abstract class BaseSettings : CommandSettings
 {

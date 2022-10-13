@@ -1,7 +1,4 @@
 using System.Text.Json;
-
-using MrDeploy;
-
 using Spectre.Console;
 using Spectre.Console.Cli;
 
