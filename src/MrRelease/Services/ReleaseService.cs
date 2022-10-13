@@ -89,7 +89,7 @@ public class ReleaseService
         var currentAttempt = environment.DeploySteps
             .Where(step => step.Status is not (DeploymentStatus.Undefined or DeploymentStatus.NotDeployed))
             .OrderBy(step => step.Attempt)
-            .Last();
+            .LastOrDefault();
 
         var web = (ReferenceLink)release.Links.Links["web"];
 
@@ -98,8 +98,8 @@ public class ReleaseService
             Name = release.Name,
             ReleaseId = release.Id,
             CreatedOn = release.CreatedOn,
-            DeployedOn = currentAttempt.LastModifiedOn,
-            Status = currentAttempt.Status,
+            DeployedOn = currentAttempt?.LastModifiedOn,
+            Status = currentAttempt?.Status ?? DeploymentStatus.Undefined,
             WebUrl = web.Href,
             Environments = deployedEnvironments,
         };

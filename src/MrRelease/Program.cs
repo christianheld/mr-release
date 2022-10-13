@@ -46,7 +46,7 @@ internal class Program
     [Conditional("DEBUG")]
     private static void ConfigureDebugSettings(IConfigurator configurator)
     {
-        //configurator.PropagateExceptions();
+        configurator.PropagateExceptions();
         configurator.ValidateExamples();
     }
 
@@ -104,6 +104,8 @@ internal class Program
         ConfigureServices(services, configuration);
 
         var app = CreateApp(services);
+
+        args = new[] { "show", "identity-data-hub", "PROD" };
 
         return app.Run(args);
     }
