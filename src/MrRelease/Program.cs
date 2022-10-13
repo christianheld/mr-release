@@ -100,9 +100,6 @@ internal class Program
         ConfigureServices(services, configuration);
 
         var app = CreateApp(services);
-
-        args = new[] { "show", "identity-data-hub", "PROD" };
-
         return app.Run(args);
     }
 }
