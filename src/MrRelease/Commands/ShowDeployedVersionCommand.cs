@@ -1,10 +1,13 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi;
+
 using MrRelease.Models;
 using MrRelease.Services;
+
 using Spectre.Console;
 using Spectre.Console.Cli;
 

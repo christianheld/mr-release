@@ -1,10 +1,13 @@
 using System.Diagnostics;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using MrRelease.Commands;
 using MrRelease.Infrastructure;
 using MrRelease.Services;
+
 using Spectre.Console;
 using Spectre.Console.Cli;
 

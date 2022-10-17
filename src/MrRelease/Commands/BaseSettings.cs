@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
+
 using Spectre.Console.Cli;
 
 namespace MrRelease.Commands;
