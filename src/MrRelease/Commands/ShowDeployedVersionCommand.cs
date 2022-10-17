@@ -1,10 +1,13 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi;
+
 using MrRelease.Models;
 using MrRelease.Services;
+
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -49,17 +52,17 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
 
         if (settings.Detailed)
         {
-            RenderList(orderedReleases);
+            RenderList(orderedReleases, settings.Environment);
         }
         else
         {
-            RenderTable(orderedReleases);
+            RenderTable(orderedReleases, settings.Environment);
         }
 
         return 0;
     }
 
-    private static void RenderList(IOrderedEnumerable<MrRelease.Models.DeployedRelease> orderedReleases)
+    private static void RenderList(IOrderedEnumerable<DeployedRelease> orderedReleases, string currentEnvironment)
     {
         foreach (var release in orderedReleases)
         {
@@ -72,7 +75,7 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
             AnsiConsole.MarkupLine($"DeployedOn: [green]{release.DeployedOn}[/]");
 
             AnsiConsole.Markup($"Environments: ");
-            AnsiConsole.Write(RenderEnvironments(release.Environments));
+            AnsiConsole.Write(RenderEnvironments(release.Environments, currentEnvironment));
             AnsiConsole.WriteLine();
 
             AnsiConsole.MarkupLine($"[grey]{release.WebUrl}[/]");
@@ -91,7 +94,7 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         };
     }
 
-    private static void RenderTable(IOrderedEnumerable<MrRelease.Models.DeployedRelease> orderedReleases)
+    private static void RenderTable(IOrderedEnumerable<DeployedRelease> orderedReleases, string currentEnvironment)
     {
         var table = new Table()
             .MarkdownBorder()
@@ -106,19 +109,30 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         foreach (var release in orderedReleases)
         {
             table.AddRow(
-                new Markup($"{release.Name}", new Style(foreground: Color.Blue, decoration: Decoration.None, link: release.WebUrl)),
+                new Markup(
+                    $"{release.Name}",
+                    new Style(foreground: Color.Blue, decoration: Decoration.None, link: release.WebUrl)),
                 RenderStatus(release),
                 new Markup($"[yellow]{FormatDateTime(release.CreatedOn)}[/]"),
                 new Markup($"[green]{FormatDateTime(release.DeployedOn)}[/]"),
-                RenderEnvironments(release.Environments));
+                RenderEnvironments(release.Environments, currentEnvironment));
         }
 
         AnsiConsole.Write(table);
     }
 
-    private static Markup RenderEnvironments(IReadOnlyList<string> environments)
+    private static Markup RenderEnvironments(IReadOnlyList<string> environments, string currentEnvironment)
     {
-        return new Markup(string.Join(", ", environments));
+        var markupLines = new string[environments.Count];
+        for (int i = 0; i < environments.Count; i++)
+        {
+            var environment = environments[i];
+            markupLines[i] = environment.StartsWith(currentEnvironment, StringComparison.OrdinalIgnoreCase)
+                ? $"[green]{environment}[/]"
+                : environment;
+        }
+
+        return new Markup(string.Join(", ", markupLines));
     }
 
     private static string FormatDateTime(DateTime? dateTime) =>
