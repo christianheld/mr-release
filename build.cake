@@ -89,8 +89,7 @@ Task("TestReport")
         "./artifacts/TestReport");
 });
 
-Task("DotNetPublish")
-    .DoesForEach(new[] { "win-x64", "linux-x64", "osx-x64" }, runtime =>
+void DotNetPublishCore(string runtime)
 {
     DotNetPublish(
         "./src/MrRelease/MrRelease.csproj",
@@ -109,16 +108,29 @@ Task("DotNetPublish")
     CopyFiles(
         $"./src/MrRelease/bin/{configuration}/net6.0/{runtime}/publish/*",
         $"./artifacts/{runtime}");
-});
+}
 
+Task("Publish-Windows")
+    .IsDependentOn("CleanArtifacts")
+    .Does(() => DotNetPublishCore("win-x64"));
+
+Task("Publish-Linux")
+    .IsDependentOn("CleanArtifacts")
+    .Does(() => DotNetPublishCore("linux-x64"));
+
+Task("Publish-Mac")
+    .IsDependentOn("CleanArtifacts")
+    .Does(() => DotNetPublishCore("osx-x64"));
 
 Task("Build")
    .IsDependentOn("CleanArtifacts")
    .IsDependentOn("Test");
 
 Task("Publish")
-    .IsDependentOn("CleanArtifacts")
-    .IsDependentOn("DotNetPublish");
+    .IsDependentOn("Publish-Windows")
+    .IsDependentOn("Publish-Linux")
+    .IsDependentOn("Publish-Mac");
+
 
 Task("Default")
     .IsDependentOn("Build")
