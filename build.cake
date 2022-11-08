@@ -106,7 +106,7 @@ void DotNetPublishCore(string runtime)
 
     CreateDirectory($"./artifacts/{runtime}");
     CopyFiles(
-        $"./src/MrRelease/bin/{configuration}/net6.0/{runtime}/publish/*",
+        $"./src/MrRelease/bin/{configuration}/net7.0/{runtime}/publish/*",
         $"./artifacts/{runtime}");
 }
 
