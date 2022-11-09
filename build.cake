@@ -100,7 +100,7 @@ void DotNetPublishCore(string runtime)
             PublishSingleFile = true,
             Runtime = runtime,
             SelfContained = true,
-            PublishTrimmed = true,
+            PublishTrimmed = false,
             IncludeNativeLibrariesForSelfExtract = true,
         });
 
