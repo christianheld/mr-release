@@ -71,7 +71,8 @@ public class ReleaseService
     {
         return status is EnvironmentStatus.Succeeded
             or EnvironmentStatus.PartiallySucceeded
-            or EnvironmentStatus.Rejected;
+            or EnvironmentStatus.Rejected
+            or EnvironmentStatus.InProgress;
     }
 
     private static DeployedRelease MapToDeployedRelease(Release release, string environmentName)

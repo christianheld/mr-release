@@ -38,6 +38,14 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
                 "Fetching Release Information",
                 async _ => await _releaseService.GetDeployedReleases(project, settings.Folder, settings.Environment));
 
+        if (settings.OnlyFailed)
+        {
+            deployedReleases = deployedReleases
+                .Where(dr => dr.Status != DeploymentStatus.Succeeded)
+                .ToList();
+        }
+
+
         if (deployedReleases.Count == 0)
         {
             AnsiConsole.Markup("[red]No Releases.[/]");
@@ -90,7 +98,8 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
             DeploymentStatus.Succeeded => new Markup("OK", new Style(Color.Green)),
             DeploymentStatus.PartiallySucceeded => new Markup("PARTIAL", new Style(Color.Yellow)),
             DeploymentStatus.Failed => new Markup("FAILED", new Style(Color.Red)),
-            _ => new Markup(release.Status.ToString())
+            DeploymentStatus.InProgress => new Markup("IN_PROGRESS", new Style(Color.Blue)),
+            _ => new Markup(release.Status.ToString().ToUpperInvariant())
         };
     }
 
@@ -162,6 +171,10 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         [Description("Show Detailed information")]
         [CommandOption("-d|--detailed")]
         public bool Detailed { get; init; }
+
+        [Description("Show only failed and partial status releases")]
+        [CommandOption("-f|--failed")]
+        public bool OnlyFailed { get; init; }
     }
 
     public enum Order
