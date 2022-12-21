@@ -16,6 +16,10 @@ var msBuildSettings = new DotNetMSBuildSettings()
 
 Setup(context =>
 {
+    // Force en-us CLI
+    // https://github.com/dotnet/sdk/issues/29543
+    Environment.SetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", "en-us");
+
     var version = context.GitVersion();
 
     context.Information($"Solution: {solution}");
