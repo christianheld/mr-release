@@ -16,6 +16,8 @@ public class AzureDevOpsOptions
     [Required]
     public string PersonalAccessToken { get; set; } = null!;
 
+    public int RefreshSeconds { get; set; } = 10;
+
     public VssConnection CreateConnection()
     {
         var credentials = new VssBasicCredential("", PersonalAccessToken);
