@@ -13,7 +13,7 @@ using Spectre.Console.Cli;
 
 namespace MrRelease;
 
-internal class Program
+internal sealed class Program
 {
     private static string? _settingsJsonPath;
 
