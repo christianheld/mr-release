@@ -57,18 +57,18 @@ public class InitCommand : AsyncCommand
 
     private static async Task SaveOptionsAsync(AzureDevOpsOptions options)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(Program.SettingsJsonPath)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(Program.DefaultSettingsPath)!);
         var json = JsonSerializer.Serialize(options, new JsonSerializerOptions { WriteIndented = true });
 
-        await File.WriteAllTextAsync(Program.SettingsJsonPath, json);
+        await File.WriteAllTextAsync(Program.DefaultSettingsPath, json);
     }
 
     private static async Task<AzureDevOpsOptions?> TryReadCurrentOptionsAsync()
     {
         AzureDevOpsOptions? currentOptions = null;
-        if (File.Exists(Program.SettingsJsonPath))
+        if (File.Exists(Program.DefaultSettingsPath))
         {
-            var currentJson = await File.ReadAllTextAsync(Program.SettingsJsonPath);
+            var currentJson = await File.ReadAllTextAsync(Program.DefaultSettingsPath);
             currentOptions = JsonSerializer.Deserialize<AzureDevOpsOptions>(currentJson);
         }
 

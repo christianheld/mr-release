@@ -124,7 +124,8 @@ Task("Publish-Linux")
 
 Task("Publish-Mac")
     .IsDependentOn("CleanArtifacts")
-    .Does(() => DotNetPublishCore("osx-x64"));
+    .Does(() => DotNetPublishCore("osx-x64"))
+    .Does(() => DotNetPublishCore("osx-arm64"));
 
 Task("Build")
    .IsDependentOn("CleanArtifacts")
@@ -134,7 +135,6 @@ Task("Publish")
     .IsDependentOn("Publish-Windows")
     .IsDependentOn("Publish-Linux")
     .IsDependentOn("Publish-Mac");
-
 
 Task("Default")
     .IsDependentOn("Build")

@@ -17,15 +17,16 @@ internal sealed class Program
 {
     private static string? _settingsJsonPath;
 
-    public static string SettingsJsonPath
+    private static readonly string UserProfileFolder =
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    public static string DefaultSettingsPath
     {
         get
         {
             if (_settingsJsonPath is null)
             {
-                var configurationDirectory = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                    ".MrRelease");
+                var configurationDirectory = Path.Combine(UserProfileFolder, ".MrRelease");
                 _settingsJsonPath = Path.Combine(configurationDirectory, "settings.json");
             }
 
@@ -33,13 +34,39 @@ internal sealed class Program
         }
     }
 
+    private static IEnumerable<string> GetConfigurationOverrides()
+    {
+        var configFileOverrides = new List<string>();
+        var currentDirectory = Directory.GetCurrentDirectory();
+
+        do
+        {
+            var configFilename = Path.Combine(currentDirectory!, "mr-release.json");
+            if (File.Exists(configFilename))
+            {
+                configFileOverrides.Add(configFilename);
+            }
+
+            currentDirectory = Directory.GetParent(currentDirectory!)?.FullName;
+        } while (currentDirectory == null || currentDirectory != UserProfileFolder);
+
+        return configFileOverrides;
+    }
+
     private static IConfiguration BuildConfiguration()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(SettingsJsonPath)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(DefaultSettingsPath)!);
 
-        return new ConfigurationBuilder()
-            .AddJsonFile(SettingsJsonPath, optional: true)
-            .Build();
+        var configurationBuilder = new ConfigurationBuilder()
+            .AddJsonFile(DefaultSettingsPath, optional: true);
+
+        foreach (var configurationOverride in GetConfigurationOverrides())
+        {
+            Console.WriteLine($"Loading configuration from {configurationOverride}");
+            configurationBuilder.AddJsonFile(configurationOverride, optional: true);
+        }
+
+        return configurationBuilder.Build();
     }
 
     [Conditional("DEBUG")]
