@@ -16,8 +16,6 @@ public class AzureDevOpsOptions
     [Required]
     public string PersonalAccessToken { get; set; } = null!;
 
-    public string Folder { get; set; } = null!;
-
     public int RefreshSeconds { get; set; } = 10;
 
     public VssConnection CreateConnection()
