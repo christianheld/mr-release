@@ -4,7 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # User-specific configurations
-*mr-release.json
+*mr-release
 
 # User-specific files
 *.rsuser

@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
 
 using MrRelease.Commands;
@@ -26,44 +28,47 @@ internal sealed class Program
         {
             if (_settingsJsonPath is null)
             {
-                var configurationDirectory = Path.Combine(UserProfileFolder, ".MrRelease");
-                _settingsJsonPath = Path.Combine(configurationDirectory, "settings.json");
+                var configurationDirectory = Path.Combine(UserProfileFolder);
+                _settingsJsonPath = Path.Combine(configurationDirectory, ".mr-release");
             }
 
             return _settingsJsonPath;
         }
     }
 
-    private static IEnumerable<string> GetConfigurationOverrides()
+    private static IEnumerable<string> GetConfigurationFiles()
     {
-        var configFileOverrides = new List<string>();
+        var configFiles = new List<string> { DefaultSettingsPath };
         var currentDirectory = Directory.GetCurrentDirectory();
 
         do
         {
-            var configFilename = Path.Combine(currentDirectory!, "mr-release.json");
+            var configFilename = Path.Combine(currentDirectory!, ".mr-release");
             if (File.Exists(configFilename))
             {
-                configFileOverrides.Add(configFilename);
+                configFiles.Add(configFilename);
             }
 
             currentDirectory = Directory.GetParent(currentDirectory!)?.FullName;
         } while (currentDirectory == null || currentDirectory != UserProfileFolder);
 
-        return configFileOverrides;
+        return configFiles;
     }
 
     private static IConfiguration BuildConfiguration()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(DefaultSettingsPath)!);
+        var configurationBuilder = new ConfigurationBuilder();
 
-        var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile(DefaultSettingsPath, optional: true);
-
-        foreach (var configurationOverride in GetConfigurationOverrides())
+        foreach (var configFile in GetConfigurationFiles())
         {
-            Console.WriteLine($"Loading configuration from {configurationOverride}");
-            configurationBuilder.AddJsonFile(configurationOverride, optional: true);
+            var configFilePath = Path.GetDirectoryName(configFile)!;
+            var configFileName = Path.GetFileName(configFile);
+
+            configurationBuilder.AddJsonFile(
+                new PhysicalFileProvider(configFilePath, ExclusionFilters.None),
+                configFileName,
+                optional: true,
+                reloadOnChange: true);
         }
 
         return configurationBuilder.Build();
