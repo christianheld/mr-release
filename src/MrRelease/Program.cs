@@ -17,10 +17,10 @@ namespace MrRelease;
 
 internal sealed class Program
 {
-    private static string? _settingsJsonPath;
-
-    private static readonly string UserProfileFolder =
+    private static readonly string _userProfileFolder =
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    private static string? _settingsJsonPath;
 
     public static string DefaultSettingsPath
     {
@@ -28,31 +28,12 @@ internal sealed class Program
         {
             if (_settingsJsonPath is null)
             {
-                var configurationDirectory = Path.Combine(UserProfileFolder);
+                var configurationDirectory = Path.Combine(_userProfileFolder);
                 _settingsJsonPath = Path.Combine(configurationDirectory, ".mr-release");
             }
 
             return _settingsJsonPath;
         }
-    }
-
-    private static IEnumerable<string> GetConfigurationFiles()
-    {
-        var configFiles = new List<string> { DefaultSettingsPath };
-        var currentDirectory = Directory.GetCurrentDirectory();
-
-        do
-        {
-            var configFilename = Path.Combine(currentDirectory!, ".mr-release");
-            if (File.Exists(configFilename))
-            {
-                configFiles.Add(configFilename);
-            }
-
-            currentDirectory = Directory.GetParent(currentDirectory!)?.FullName;
-        } while (currentDirectory == null || currentDirectory != UserProfileFolder);
-
-        return configFiles;
     }
 
     private static IConfiguration BuildConfiguration()
@@ -127,8 +108,28 @@ internal sealed class Program
         return app;
     }
 
+    private static IEnumerable<string> GetConfigurationFiles()
+    {
+        var configFiles = new List<string> { DefaultSettingsPath };
+        var currentDirectory = Directory.GetCurrentDirectory();
+
+        do
+        {
+            var configFilename = Path.Combine(currentDirectory!, ".mr-release");
+            if (File.Exists(configFilename) && currentDirectory != _userProfileFolder)
+            {
+                configFiles.Add(configFilename);
+            }
+
+            currentDirectory = Directory.GetParent(currentDirectory!)?.FullName;
+        } while (currentDirectory == null);
+
+        return configFiles;
+    }
+
     private static int Main(string[] args)
     {
+        MigrateConfiguration();
         var configuration = BuildConfiguration();
         var services = new ServiceCollection();
 
@@ -136,5 +137,19 @@ internal sealed class Program
 
         var app = CreateApp(services);
         return app.Run(args);
+    }
+
+    private static void MigrateConfiguration()
+    {
+        var legacySettingsPath = Path.Combine(_userProfileFolder, ".MrRelease", "settings.json");
+
+        if (File.Exists(legacySettingsPath) && !File.Exists(DefaultSettingsPath))
+        {
+            File.Move(legacySettingsPath, DefaultSettingsPath);
+            Directory.Delete(Path.Combine(_userProfileFolder, ".MrRelease"));
+            AnsiConsole.MarkupLine(
+                ":party_popper: Migrated configuration to \".mr-release\" file :party_popper:" +
+                Environment.NewLine);
+        }
     }
 }
