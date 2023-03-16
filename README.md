@@ -11,13 +11,18 @@ Also I wanted to play with [`Spectre.Console`](https://spectreconsole.net/) and
 Currently `MrRelase` supports following commands:
 
 ### Initialize configuration
- `init` - Inititalize Mr.Release and write settings to `~/.mrrelease/settings.json`
+ `init` - Initialize Mr.Release and write settings to `~/.mr-release`
 
 Make sure you have created a Personal Access Token with rights to read releases!
 
 ```example
 MrRelease init
 ```
+#### Optional: Scoped configurations
+
+You can specify configurations based on the current directory. This is useful if you have to handle multiple projects.
+To do so, just place an additional `.mr-release` configuration file next to your project and modify according your needs.
+Mr-Release will look for configuration files in the current directory and all parent directories.
 
 ### Show current releases
 `show` - Show the currently active releases inside a folder for a certain stage.

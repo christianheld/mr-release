@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
 
 using MrRelease.Commands;
@@ -17,29 +19,59 @@ internal sealed class Program
 {
     private static string? _settingsJsonPath;
 
-    public static string SettingsJsonPath
+    private static readonly string UserProfileFolder =
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    public static string DefaultSettingsPath
     {
         get
         {
             if (_settingsJsonPath is null)
             {
-                var configurationDirectory = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                    ".MrRelease");
-                _settingsJsonPath = Path.Combine(configurationDirectory, "settings.json");
+                var configurationDirectory = Path.Combine(UserProfileFolder);
+                _settingsJsonPath = Path.Combine(configurationDirectory, ".mr-release");
             }
 
             return _settingsJsonPath;
         }
     }
 
+    private static IEnumerable<string> GetConfigurationFiles()
+    {
+        var configFiles = new List<string> { DefaultSettingsPath };
+        var currentDirectory = Directory.GetCurrentDirectory();
+
+        do
+        {
+            var configFilename = Path.Combine(currentDirectory!, ".mr-release");
+            if (File.Exists(configFilename))
+            {
+                configFiles.Add(configFilename);
+            }
+
+            currentDirectory = Directory.GetParent(currentDirectory!)?.FullName;
+        } while (currentDirectory == null || currentDirectory != UserProfileFolder);
+
+        return configFiles;
+    }
+
     private static IConfiguration BuildConfiguration()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(SettingsJsonPath)!);
+        var configurationBuilder = new ConfigurationBuilder();
 
-        return new ConfigurationBuilder()
-            .AddJsonFile(SettingsJsonPath, optional: true)
-            .Build();
+        foreach (var configFile in GetConfigurationFiles())
+        {
+            var configFilePath = Path.GetDirectoryName(configFile)!;
+            var configFileName = Path.GetFileName(configFile);
+
+            configurationBuilder.AddJsonFile(
+                new PhysicalFileProvider(configFilePath, ExclusionFilters.None),
+                configFileName,
+                optional: true,
+                reloadOnChange: true);
+        }
+
+        return configurationBuilder.Build();
     }
 
     [Conditional("DEBUG")]
