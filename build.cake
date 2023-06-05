@@ -103,7 +103,7 @@ void DotNetPublishCore(string runtime)
             Verbosity = dotNetVerbosity,
             PublishSingleFile = true,
             Runtime = runtime,
-            SelfContained = true,
+            SelfContained = false,
             PublishTrimmed = false,
             IncludeNativeLibrariesForSelfExtract = true,
         });
