@@ -7,6 +7,11 @@ namespace MrRelease.Commands;
 
 public class InitCommand : AsyncCommand
 {
+    private static JsonSerializerOptions _serializerOptions = new()
+    {
+        WriteIndented = true
+    };
+
     public override async Task<int> ExecuteAsync(CommandContext context)
     {
         var currentOptions = await TryReadCurrentOptionsAsync();
@@ -76,9 +81,7 @@ public class InitCommand : AsyncCommand
     private static async Task SaveOptionsAsync(AzureDevOpsOptions options)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(Program.DefaultSettingsPath)!);
-        var json = JsonSerializer.Serialize(
-            options,
-            new JsonSerializerOptions { WriteIndented = true });
+        var json = JsonSerializer.Serialize(options, _serializerOptions);
 
         await File.WriteAllTextAsync(Program.DefaultSettingsPath, json);
     }

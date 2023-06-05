@@ -18,9 +18,11 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
     private readonly AzureDevOpsOptions _azureDevOpsOptions;
     private readonly ReleaseService _releaseService;
 
-    public ShowDeployedVersionCommand(ReleaseService releaseService, IOptions<AzureDevOpsOptions> azureDevOpsOptions)
+    public ShowDeployedVersionCommand(
+        ReleaseService releaseService,
+        IOptions<AzureDevOpsOptions> azureDevOpsOptions)
     {
-        if (azureDevOpsOptions is null) throw new ArgumentNullException(nameof(azureDevOpsOptions));
+        ArgumentNullException.ThrowIfNull(azureDevOpsOptions);
 
         _releaseService = releaseService;
         _azureDevOpsOptions = azureDevOpsOptions.Value;
@@ -32,7 +34,7 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         Name
     }
 
-    public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         if (settings.WatchMode)
         {
@@ -59,39 +61,46 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         }
         else
         {
-            var table = CreateReleaseTable();
-            await AnsiConsole.Live(table)
-                .StartAsync(async context =>
-                {
-                    while (true)
-                    {
-                        table.Rows.Clear();
-                        RenderTableRows(table, deployedReleases, settings.Environment);
-                        context.Refresh();
-
-                        if (!settings.WatchMode)
-                        {
-                            return 0;
-                        }
-
-                        for (int i = _azureDevOpsOptions.RefreshSeconds * 2; i > 0; i--)
-                        {
-                            table
-                                .Caption(string.Format(CultureInfo.InvariantCulture, "Refresh in {0}s", (i + 1) / 2))
-                                .LeftAligned();
-
-                            context.Refresh();
-                            await Task.Delay(TimeSpan.FromMilliseconds(500));
-                        }
-
-                        table.Caption($"Loading...").LeftAligned();
-                        context.Refresh();
-                        deployedReleases = await GetReleasesAsync(settings);
-                    }
-                });
+            await RenderTableAsync(settings, deployedReleases);
         }
 
         return 0;
+    }
+
+    private async Task RenderTableAsync(
+        Settings settings,
+        IReadOnlyList<DeployedRelease> deployedReleases)
+    {
+        var table = CreateReleaseTable();
+        await AnsiConsole
+            .Live(table)
+            .StartAsync(async context =>
+            {
+                while (true)
+                {
+                    table.Rows.Clear();
+                    RenderTableRows(table, deployedReleases, settings.Environment);
+                    context.Refresh();
+
+                    if (!settings.WatchMode)
+                    {
+                        return 0;
+                    }
+
+                    for (int i = _azureDevOpsOptions.RefreshSeconds * 2; i > 0; i--)
+                    {
+                        table.Caption(string.Format(CultureInfo.InvariantCulture, "Refresh in {0}s", (i + 1) / 2))
+                            .LeftAligned();
+
+                        context.Refresh();
+                        await Task.Delay(TimeSpan.FromMilliseconds(500));
+                    }
+
+                    table.Caption($"Loading...").LeftAligned();
+                    context.Refresh();
+                    deployedReleases = await GetReleasesAsync(settings);
+                }
+            });
     }
 
     private static Table CreateReleaseTable()
@@ -110,7 +119,7 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
     }
 
     private static string FormatDateTime(DateTime? dateTime) =>
-            dateTime.HasValue ? FormatDateTime(dateTime.Value) : "";
+        dateTime.HasValue ? FormatDateTime(dateTime.Value) : "";
 
     private static string FormatDateTime(DateTime dateTime)
     {
@@ -118,13 +127,16 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         return localTime.ToString(CultureInfo.CurrentCulture);
     }
 
-    private static Markup RenderEnvironments(IReadOnlyList<string> environments, string currentEnvironment)
+    private static Markup RenderEnvironments(
+        IReadOnlyList<string> environments,
+        string currentEnvironment)
     {
         var markupLines = new string[environments.Count];
         for (int i = 0; i < environments.Count; i++)
         {
             var environment = environments[i];
-            markupLines[i] = environment.StartsWith(currentEnvironment, StringComparison.OrdinalIgnoreCase)
+            markupLines[i] = environment
+                .StartsWith(currentEnvironment, StringComparison.OrdinalIgnoreCase)
                 ? $"[green]{environment}[/]"
                 : environment;
         }
@@ -173,9 +185,7 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         foreach (var release in orderedReleases)
         {
             table.AddRow(
-                new Markup(
-                    $"{release.Name}",
-                    new Style(foreground: Color.Blue, decoration: Decoration.None, link: release.WebUrl)),
+                new Markup($"{release.Name}", new Style(foreground: Color.Blue, decoration: Decoration.None, link: release.WebUrl)),
                 RenderStatus(release),
                 new Markup($"[yellow]{FormatDateTime(release.CreatedOn)}[/]"),
                 new Markup($"[green]{FormatDateTime(release.DeployedOn)}[/]"),

@@ -4,12 +4,11 @@ namespace MrRelease.Models;
 
 public record DeployedRelease
 {
-    // TODO: Make properties "required" in .NET 7
-    public string Name { get; init; } = null!;
-    public int ReleaseId { get; init; }
-    public DateTime CreatedOn { get; init; }
+    public required string Name { get; init; }
+    public required int ReleaseId { get; init; }
+    public required DateTime CreatedOn { get; init; }
     public DateTime? DeployedOn { get; init; }
-    public DeploymentStatus Status { get; init; }
-    public string WebUrl { get; init; } = null!;
-    public IReadOnlyList<string> Environments { get; init; } = Array.Empty<string>();
+    public required DeploymentStatus Status { get; init; }
+    public required string WebUrl { get; init; }
+    public required IReadOnlyList<string> Environments { get; init; }
 }
