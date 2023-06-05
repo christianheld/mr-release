@@ -15,7 +15,7 @@ using Spectre.Console.Cli;
 
 namespace MrRelease;
 
-internal sealed class Program
+public sealed class Program
 {
     private static readonly string _userProfileFolder =
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
