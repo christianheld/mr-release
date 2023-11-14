@@ -77,7 +77,7 @@ public class ReleaseService
 
     private static DeployedRelease MapToDeployedRelease(Release release, string environmentName)
     {
-        if (release is null) throw new ArgumentNullException(nameof(release));
+        ArgumentNullException.ThrowIfNull(release);
 
         var environment = release.Environments
               .First(env => env.Name.StartsWith(environmentName, StringComparison.OrdinalIgnoreCase));

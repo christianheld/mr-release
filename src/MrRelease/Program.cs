@@ -108,7 +108,7 @@ public sealed class Program
         return app;
     }
 
-    private static IEnumerable<string> GetConfigurationFiles()
+    private static List<string> GetConfigurationFiles()
     {
         var configFiles = new List<string> { DefaultSettingsPath };
         var currentDirectory = Directory.GetCurrentDirectory();
