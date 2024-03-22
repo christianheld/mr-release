@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Services.Release.Client" Version="16.205.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.Release.Client" Version="19.225.1" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.48.0" />
   </ItemGroup>
 

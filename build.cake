@@ -1,5 +1,5 @@
-#tool "dotnet:?package=GitVersion.Tool&version=5.10.3"
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.1.9"
+#tool "dotnet:?package=GitVersion.Tool&version=5.12.0"
+#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.2.4"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
