@@ -44,10 +44,12 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
         AnsiConsole.MarkupLine($"Directory:   [blue]{settings.Folder}[/]");
         AnsiConsole.MarkupLine($"Environment: [green]{settings.Environment}[/]");
 
+        Console.Write(ProgressStrings.Indeterminate);
         var deployedReleases = await AnsiConsole.Status()
             .StartAsync(
                 "Fetching Release Information",
                 async _ => await GetReleasesAsync(settings));
+        Console.Write(ProgressStrings.Reset);
 
         if (deployedReleases.Count == 0 && !settings.WatchMode)
         {
@@ -96,9 +98,11 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
                         await Task.Delay(TimeSpan.FromMilliseconds(500));
                     }
 
+                    Console.Write(ProgressStrings.Indeterminate);
                     table.Caption($"Loading...").LeftAligned();
                     context.Refresh();
                     deployedReleases = await GetReleasesAsync(settings);
+                    Console.Write(ProgressStrings.Reset);
                 }
             });
     }
