@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Microsoft.Extensions.Options;
@@ -101,6 +100,7 @@ public class ShowDeployedVersionCommand : AsyncCommand<ShowDeployedVersionComman
                     Console.Write(ProgressStrings.Indeterminate);
                     table.Caption($"Loading...").LeftAligned();
                     context.Refresh();
+
                     deployedReleases = await GetReleasesAsync(settings);
                     Console.Write(ProgressStrings.Reset);
                 }

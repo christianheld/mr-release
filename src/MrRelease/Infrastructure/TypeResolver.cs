@@ -2,14 +2,9 @@ using Spectre.Console.Cli;
 
 namespace MrRelease.Infrastructure;
 
-public sealed class TypeResolver : ITypeResolver, IDisposable
+public sealed class TypeResolver(IServiceProvider serviceProvider) : ITypeResolver, IDisposable
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public TypeResolver(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public void Dispose()
     {

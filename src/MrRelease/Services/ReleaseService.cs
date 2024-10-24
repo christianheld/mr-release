@@ -10,19 +10,14 @@ using MrRelease.Models;
 
 namespace MrRelease.Services;
 
-public class ReleaseService
+public class ReleaseService(IOptions<AzureDevOpsOptions> azureDevOpsSettings)
 {
-    private readonly AzureDevOpsOptions _azureDevOpsSettings;
-
-    public ReleaseService(IOptions<AzureDevOpsOptions> azureDevOpsSettings)
-    {
-        _azureDevOpsSettings = azureDevOpsSettings?.Value ?? throw new ArgumentNullException(nameof(azureDevOpsSettings));
-    }
+    private readonly AzureDevOpsOptions _azureDevOpsSettings = azureDevOpsSettings?.Value ??
+        throw new ArgumentNullException(nameof(azureDevOpsSettings));
 
     private async Task<IReadOnlyList<Release>> GetActiveReleasesAsync(string project, string folder)
     {
-        if (string.IsNullOrWhiteSpace(folder))
-            throw new ArgumentException($"'{nameof(folder)}' cannot be null or whitespace.", nameof(folder));
+        ArgumentException.ThrowIfNullOrWhiteSpace(project);
 
         using var connection = _azureDevOpsSettings.CreateConnection();
         var client = await connection.GetClientAsync<ReleaseHttpClient2>();
@@ -52,7 +47,10 @@ public class ReleaseService
         return releases;
     }
 
-    public async Task<IReadOnlyList<DeployedRelease>> GetDeployedReleases(string project, string folder, string environment)
+    public async Task<IReadOnlyList<DeployedRelease>> GetDeployedReleases(
+        string project,
+        string folder,
+        string environment)
     {
         var activeReleases = await GetActiveReleasesAsync(project, folder);
 
@@ -88,7 +86,8 @@ public class ReleaseService
             .ToList();
 
         var currentAttempt = environment.DeploySteps
-            .Where(step => step.Status is not (DeploymentStatus.Undefined or DeploymentStatus.NotDeployed))
+            .Where(step =>
+                step.Status is not (DeploymentStatus.Undefined or DeploymentStatus.NotDeployed))
             .OrderBy(step => step.Attempt)
             .LastOrDefault();
 
@@ -106,7 +105,10 @@ public class ReleaseService
         };
     }
 
-    private static async Task<string> GetFolderPathAsync(ReleaseHttpClient2 client, string project, string folder)
+    private static async Task<string> GetFolderPathAsync(
+        ReleaseHttpClient2 client,
+        string project,
+        string folder)
     {
         var searchFolder = $"\\{folder.Replace('/', '\\')}";
 
@@ -119,7 +121,8 @@ public class ReleaseService
 
         if (folders.Count > 1)
         {
-            throw new InvalidOperationException($"Ambiguous folder query: \"{folder}\", {folders.Count} matches found.");
+            throw new InvalidOperationException(
+                $"Ambiguous folder query: \"{folder}\", {folders.Count} matches found.");
         }
 
         return folders[0].Path;

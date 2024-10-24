@@ -4,14 +4,9 @@ using Spectre.Console.Cli;
 
 namespace MrRelease.Infrastructure;
 
-public class TypeRegistrar : ITypeRegistrar
+public class TypeRegistrar(IServiceCollection services) : ITypeRegistrar
 {
-    private readonly IServiceCollection _services;
-
-    public TypeRegistrar(IServiceCollection services)
-    {
-        _services = services;
-    }
+    private readonly IServiceCollection _services = services;
 
     public ITypeResolver Build() => new TypeResolver(_services.BuildServiceProvider());
 

@@ -85,7 +85,7 @@ public sealed class Program
             cfg.AddCommand<ShowDeployedVersionCommand>("show")
                 .WithDescription($"Show currently deployed releases. Run [grey]show --help[/] for details.");
 
-            cfg.SetExceptionHandler(ex =>
+            cfg.SetExceptionHandler((ex, _) =>
             {
                 if (ex.InnerException is OptionsValidationException validationException)
                 {
