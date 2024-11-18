@@ -1,13 +1,7 @@
 <Project>
-    <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <WarningsAsErrors>Nullable</WarningsAsErrors>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
-            <PrivateAssets>All</PrivateAssets>
-        </PackageReference>
-    </ItemGroup>
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+  </PropertyGroup>
 </Project>

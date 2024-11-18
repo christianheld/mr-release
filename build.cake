@@ -1,5 +1,4 @@
-#tool "dotnet:?package=GitVersion.Tool&version=5.12.0"
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.2.4"
+#addin nuget:?package=Cake.GitVersioning&version=3.6.146
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -16,14 +15,10 @@ var msBuildSettings = new DotNetMSBuildSettings()
 
 Setup(context =>
 {
-    // Force en-us CLI
-    // https://github.com/dotnet/sdk/issues/29543
-    Environment.SetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", "en-us");
-
-    var version = context.GitVersion();
+    var version = GitVersioningGetVersion();
 
     context.Information($"Solution: {solution}");
-    context.Information($"Version:  {version.FullSemVer}");
+    context.Information($"Version:  {version.SemVer2}");
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,15 +77,6 @@ Task("Test")
           Collectors = { "XPlat Code Coverage" }
        }
     );
-});
-
-Task("TestReport")
-    .IsDependentOn("Test")
-    .Does(() => 
-{
-    ReportGenerator(
-        new GlobPattern("./tests/**/coverage.cobertura.xml"),
-        "./artifacts/TestReport");
 });
 
 void DotNetPublishCore(string runtime)
